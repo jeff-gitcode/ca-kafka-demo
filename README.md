@@ -4,6 +4,8 @@
 
 - [x] ca
 - [x] kafka
+- [x] Kafkdrop
+-
 
 ```javascript
 $ dotnet new sln -o ca-kafka-demo
