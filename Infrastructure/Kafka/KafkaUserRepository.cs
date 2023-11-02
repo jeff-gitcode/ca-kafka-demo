@@ -1,6 +1,7 @@
 using Application.Abstration;
 using Confluent.Kafka;
 using Domain;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace Infrastructure.Kafka;
