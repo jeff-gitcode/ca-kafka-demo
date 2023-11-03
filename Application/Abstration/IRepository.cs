@@ -4,9 +4,9 @@ namespace Application.Abstration;
 
 public interface IRepository<T> where T : User
 {
-    IEnumerable<T> GetAll();
+    Task<IEnumerable<T>> GetAll();
     Task<T> Add(T entity);
-    T Update(T entity);
-    T Get(int id);
-    void Delete(int id);
+    Task<T> Update(T entity);
+    Task<T> Get(int id);
+    Task<T> Delete(int id);
 }

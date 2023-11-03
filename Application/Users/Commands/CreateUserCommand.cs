@@ -4,15 +4,20 @@ using Domain;
 
 namespace Application.Users.Commands
 {
+
     public record CreateUserCommand(User user) : ICommand<User>
     {
     }
 
     public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, User>
     {
-        public Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        private readonly IUserRepository _repository;
+
+        public CreateUserCommandHandler(IUserRepository repository)
         {
-            return null;
+            _repository = repository;
         }
+
+        public async Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken) => await _repository.Add(request.user);
     }
 }

@@ -41,23 +41,22 @@ public class KafkaUserRepository : IUserRepository
         return user;
     }
 
-    
-    public void Delete(int id)
+    public Task<User> Delete(int id)
     {
         throw new NotImplementedException();
     }
 
-    public User Get(int id)
+    public Task<User> Get(int id)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<User> GetAll()
+    public Task<IEnumerable<User>> GetAll()
     {
         throw new NotImplementedException();
     }
 
-    public User Update(User entity)
+    public Task<User> Update(User entity)
     {
         throw new NotImplementedException();
     }

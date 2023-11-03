@@ -9,11 +9,13 @@ namespace Application.Users.Queries
 
     public class GetAllUserQueryHandler: IQueryHandler<GetAllUserQuery, IEnumerable<User>>
     {
-        public GetAllUserQueryHandler() { }
+        private readonly IUserRepository _repository;
 
-        public Task<IEnumerable<User>> Handle(GetAllUserQuery request, CancellationToken cancellationToken)
+        public GetAllUserQueryHandler(IUserRepository repository)
         {
-            throw new NotImplementedException();
+            _repository = repository;
         }
+
+        public async Task<IEnumerable<User>> Handle(GetAllUserQuery request, CancellationToken cancellationToken) => await _repository.GetAll();
     }
 }

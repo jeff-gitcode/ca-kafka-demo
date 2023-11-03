@@ -26,8 +26,16 @@ public class UserController : ControllerBase
         return Ok(await _mediator.Send(command));
     }
 
+    [HttpDelete(Name = "")]
+    public async Task<ActionResult<User>> DeleteUserAsync(DeleteUserCommand command)
+    {
+        _logger.LogInformation("Presentation.Controllers");
+
+        return Ok(await _mediator.Send(command));
+    }
+
     [HttpGet(Name = "")]
-    public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+    public async Task<ActionResult<IEnumerable<User>>> GetAllUsersAsync()
     {
         _logger.LogInformation("Presentation.Controllers");
 
