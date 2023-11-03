@@ -32,6 +32,21 @@ $ dotnet sln add (ls -r **//*.csproj)
 $ dotnet build ca-kafka-demo.sln
 $ dotnet run --project .\WebApi\
 
+# apply kafka
 $ dotnet add .\ Install-Package Confluent.Kafka
 $ dotnet add .\ Install-Package Confluent.SchemaRegistry.Serdes.Avro
+
+# kafka server
+# update daemon.json, set "experimental": true
+$ docker-compose up -d
+$ docker-compose ps
+$ docker-compose stop
+
+# prune image
+$ docker image prune -a
+# delete all containers
+$ docker rm -f $(docker ps -a -q)
+# delete all volumes
+$ docker volume rm $(docker volume ls -q)
+
 ```
