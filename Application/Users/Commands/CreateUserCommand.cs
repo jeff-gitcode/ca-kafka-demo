@@ -1,15 +1,16 @@
-﻿using Application.Abstration;
+﻿using System.Windows.Input;
+using Application.Abstration;
 using Domain;
 
 namespace Application.Users.Commands
 {
-    public record CreateUserCommand(User user) : CommandBase<User>
+    public record CreateUserCommand(User user) : ICommand<User>
     {
     }
 
-    public class CreateUserCommandHandler : CommandHandler<CreateUserCommand, User>
+    public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, User>
     {
-        public override Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             return null;
         }
