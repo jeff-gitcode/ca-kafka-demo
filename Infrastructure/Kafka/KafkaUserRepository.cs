@@ -15,7 +15,7 @@ public class KafkaUserRepository : IUserRepository
         _kafkaProducer = kafkaProducer;
     }
 
-    public async Task<User> AddUser(User user)
+    public async Task<User> Add(User user)
     {
         string message = JsonConvert.SerializeObject(user);
 
@@ -41,22 +41,23 @@ public class KafkaUserRepository : IUserRepository
         return user;
     }
 
-    public void DeleteUser(int userId)
+    
+    public void Delete(int id)
     {
         throw new NotImplementedException();
     }
 
-    public User GetUser(int userId)
+    public User Get(int id)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<User> GetUsers()
+    public IEnumerable<User> GetAll()
     {
         throw new NotImplementedException();
     }
 
-    public User UpdateUser(User user)
+    public User Update(User entity)
     {
         throw new NotImplementedException();
     }

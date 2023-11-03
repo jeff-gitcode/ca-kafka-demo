@@ -1,12 +1,8 @@
-using Domain;
+﻿using Domain;
 
-namespace Application.Abstration;
-
-public interface IUserRepository
+namespace Application.Abstration
 {
-    IEnumerable<User> GetUsers();
-    Task<User> AddUser(User user);
-    User UpdateUser(User user);
-    User GetUser(int userId);
-    void DeleteUser(int userId);
+    public interface IUserRepository : IRepository<User>
+    {
+    }
 }

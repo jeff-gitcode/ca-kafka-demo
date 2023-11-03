@@ -1,4 +1,5 @@
 using Application.Users.Commands;
+using Application.Users.Queries;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,20 @@ public class UserController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost(Name = "addUser")]
-    public async Task<User> AddUserAsync(CreateUserCommand command)
+    [HttpPost(Name = "")]
+    public async Task<ActionResult<User>> AddUserAsync(CreateUserCommand command)
     {
         _logger.LogInformation("Presentation.Controllers");
 
-        return await _mediator.Send(command);
+        return Ok(await _mediator.Send(command));
     }
+
+    [HttpGet(Name = "")]
+    public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+    {
+        _logger.LogInformation("Presentation.Controllers");
+
+        return Ok(await _mediator.Send(new GetAllUserQuery()));
+    }
+
 }

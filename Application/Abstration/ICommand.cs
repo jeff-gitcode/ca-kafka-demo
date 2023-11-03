@@ -1,5 +1,4 @@
-﻿using Domain;
-using MediatR;
+﻿using MediatR;
 
 namespace Application.Abstration
 {
