@@ -1,8 +1,11 @@
 # CA Kafka Demo
 
+![alt text](./doc/kafka-demo.jpg)
+
 ## Tech Stack
 
 - [x] ca
+- [x] mediatr
 - [x] kafka
 - [x] Kafdrop
 - [x] Zookeeper
