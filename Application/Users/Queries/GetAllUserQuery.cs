@@ -3,11 +3,9 @@ using Domain;
 
 namespace Application.Users.Queries
 {
-    public class GetAllUserQuery: IQuery<IEnumerable<User>>
-    {
-    }
+    public class GetAllUserQuery : IQuery<IEnumerable<User>> { }
 
-    public class GetAllUserQueryHandler: IQueryHandler<GetAllUserQuery, IEnumerable<User>>
+    public class GetAllUserQueryHandler : IQueryHandler<GetAllUserQuery, IEnumerable<User>>
     {
         private readonly IUserRepository _repository;
 
@@ -16,6 +14,9 @@ namespace Application.Users.Queries
             _repository = repository;
         }
 
-        public async Task<IEnumerable<User>> Handle(GetAllUserQuery request, CancellationToken cancellationToken) => await _repository.GetAll();
+        public async Task<IEnumerable<User>> Handle(
+            GetAllUserQuery request,
+            CancellationToken cancellationToken
+        ) => await _repository.GetAll();
     }
 }

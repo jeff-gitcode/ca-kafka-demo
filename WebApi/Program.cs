@@ -1,5 +1,6 @@
 using Application;
 using Infrastructure;
+using Infrastructure.Kafka;
 using Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,11 +11,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
+builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(KafkaSettings.Kafka));
+
 // add dependencies
-builder.Services
-    .AddApplication()
-    .AddInfrastructure()
-    .AddPresentation();
+builder.Services.AddApplication().AddInfrastructure().AddPresentation();
 
 var app = builder.Build();
 
@@ -27,10 +27,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// var summaries = new[]
+// {
+//     "Freezing",
+//     "Bracing",
+//     "Chilly",
+//     "Cool",
+//     "Mild",
+//     "Warm",
+//     "Balmy",
+//     "Hot",
+//     "Sweltering",
+//     "Scorching"
+// };
 
 //app.MapGet("/weatherforecast", () =>
 //{

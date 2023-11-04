@@ -41,5 +41,4 @@ public class UserController : ControllerBase
 
         return Ok(await _mediator.Send(new GetAllUserQuery()));
     }
-
 }

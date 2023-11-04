@@ -3,9 +3,7 @@ using Domain;
 
 namespace Application.Users.Commands
 {
-    public record DeleteUserCommand(string id) : ICommand<User>
-    {
-    }
+    public record DeleteUserCommand(string id) : ICommand<User> { }
 
     public class DeleteUserCommandHandler : ICommandHandler<DeleteUserCommand, User>
     {

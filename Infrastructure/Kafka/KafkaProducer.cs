@@ -18,7 +18,7 @@ namespace Infrastructure.Kafka
             {
                 var config = new ProducerConfig
                 {
-                    BootstrapServers = _kafkaSettings.BootstrapServers
+                    BootstrapServers = _kafkaSettings.BrokerLocation,
                 };
 
                 using (var producer = new ProducerBuilder<TKey, TValue>(config).Build())
@@ -30,7 +30,6 @@ namespace Infrastructure.Kafka
             }
             catch (Exception ex)
             {
-                // Handle exceptions, log errors, etc.
                 Console.WriteLine($"Kafka error: {ex.Message}");
                 return false;
             }

@@ -4,8 +4,8 @@
 
 - [x] ca
 - [x] kafka
-- [x] Kafkdrop
--
+- [x] Kafdrop
+- [x] Zookeeper
 
 ```javascript
 $ dotnet new sln -o ca-kafka-demo
@@ -29,6 +29,7 @@ $ dotnet add .\WebApi\ reference .\Application\
 # add to sln
 $ dotnet sln add (ls -r **//*.csproj)
 
+# run webapi
 $ dotnet build ca-kafka-demo.sln
 $ dotnet run --project .\WebApi\
 
@@ -50,3 +51,7 @@ $ docker rm -f $(docker ps -a -q)
 $ docker volume rm $(docker volume ls -q)
 
 ```
+
+![alt text](./doc/kafdrop-1.png)
+![alt text](./doc/kafdrop-2.png)
+![alt text](./doc/ca-kafka-demo.gif)

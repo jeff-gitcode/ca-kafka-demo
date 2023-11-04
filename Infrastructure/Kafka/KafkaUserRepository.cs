@@ -2,17 +2,18 @@ using Application.Abstration;
 using Confluent.Kafka;
 using Domain;
 using Newtonsoft.Json;
-using System.Diagnostics;
 
 namespace Infrastructure.Kafka;
 
 public class KafkaUserRepository : IUserRepository
 {
     private readonly IKafkaProducer<Null, string> _kafkaProducer;
+    private readonly IKafkaConsumer<User> _kafkaConsumer;
 
-    public KafkaUserRepository(IKafkaProducer<Null, string> kafkaProducer)
+    public KafkaUserRepository(IKafkaProducer<Null, string> kafkaProducer, IKafkaConsumer<User> kafkaConsumer)
     {
         _kafkaProducer = kafkaProducer;
+        _kafkaConsumer = kafkaConsumer;
     }
 
     public async Task<User> Add(User user)
@@ -24,21 +25,15 @@ public class KafkaUserRepository : IUserRepository
             Value = message
         };
 
-        string kafkaTopic = "mytopic1";
+        string kafkaTopic = "user-test";
         bool result = await _kafkaProducer.ProduceAsync(kafkaTopic, kafkaMessage);
 
         if (result)
         {
-            // Debug output
-            Debug.WriteLine("User data sent to Kafka successfully.");
-        }
-        else
-        {
-            // Debug output
-            Debug.WriteLine("Failed to send user data to Kafka.");
+            return user;
         }
 
-        return user;
+        return null;
     }
 
     public Task<User> Delete(int id)
@@ -51,9 +46,10 @@ public class KafkaUserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<User>> GetAll()
+    public async Task<IEnumerable<User>> GetAll()
     {
-        throw new NotImplementedException();
+        var cts = new CancellationTokenSource();
+        return await _kafkaConsumer.ConsumeAsync("user-test", cts.Token);
     }
 
     public Task<User> Update(User entity)

@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Infrastructure.Kafka
 {
-    public class KafkaConsumer: IKafkaConsumer
+    public class KafkaConsumer<T> : IKafkaConsumer<T>
     {
         private readonly KafkaSettings _kafkaSettings;
         private Thread thread;
@@ -15,14 +15,16 @@ namespace Infrastructure.Kafka
             _kafkaSettings = kafkaSettings.Value;
         }
 
-        public async Task ConsumeAsync(string topic, CancellationToken cancellationToken)
+        public async Task<IEnumerable<T>> ConsumeAsync(
+            string topic,
+            CancellationToken cancellationToken = default
+        )
         {
             var config = new ConsumerConfig
             {
                 GroupId = _kafkaSettings.GroupId,
                 BootstrapServers = _kafkaSettings.BrokerLocation,
-
-                AutoOffsetReset = AutoOffsetReset.Latest
+                AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
             using (var consumerBuilder = new ConsumerBuilder<Ignore, string>(config).Build())
@@ -32,18 +34,23 @@ namespace Infrastructure.Kafka
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var consumer = consumerBuilder.Consume(cancellationToken);
-                    var signRequest = JsonSerializer.Deserialize
-                                <User>
-                                    (consumer.Message.Value);
 
+                    var result = JsonSerializer.Deserialize<T>(consumer.Message.Value);
+
+                    return new T[] { result };
                 }
                 consumerBuilder.Close();
             }
+
+            return null;
         }
     }
 
-    public interface IKafkaConsumer
+    public interface IKafkaConsumer<T>
     {
-        Task ConsumeAsync(string topic, CancellationToken cancellationToken);
+        Task<IEnumerable<T>> ConsumeAsync(
+            string topic,
+            CancellationToken cancellationToken = default
+        );
     }
 }
