@@ -1,6 +1,7 @@
-﻿using System.Windows.Input;
-using Application.Abstration;
+﻿using Application.Abstration;
+using Application.Users.Notifications;
 using Domain;
+using MediatR;
 
 namespace Application.Users.Commands
 {
@@ -9,15 +10,24 @@ namespace Application.Users.Commands
     public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, User>
     {
         private readonly IUserRepository _repository;
+        private readonly IPublisher _publisher;
 
-        public CreateUserCommandHandler(IUserRepository repository)
+        public CreateUserCommandHandler(IUserRepository repository, IPublisher publisher)
         {
             _repository = repository;
+            _publisher = publisher;
         }
 
         public async Task<User> Handle(
             CreateUserCommand request,
             CancellationToken cancellationToken
-        ) => await _repository.Add(request.user);
+        )
+        {
+            var result = await _repository.Add(request.user);
+
+            await _publisher.Publish(new CreateUserNotification(result), cancellationToken);
+
+            return result;
+        }
     }
 }
