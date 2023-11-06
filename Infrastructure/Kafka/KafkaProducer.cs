@@ -1,32 +1,29 @@
-﻿using Confluent.Kafka;
+﻿using Ardalis.GuardClauses;
+using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Kafka
 {
     public class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
     {
-        private readonly KafkaSettings _kafkaSettings;
-
-        public KafkaProducer(IOptions<KafkaSettings> kafkaSettings)
+        private readonly IProducer<TKey, TValue> _producer;
+        private readonly KafkaProducerConfig _config;
+        public KafkaProducer(IOptions<KafkaProducerConfig> config, IProducer<TKey, TValue> producer)
         {
-            _kafkaSettings = kafkaSettings.Value;
+            Guard.Against.Null(producer);
+            Guard.Against.Null(config);
+
+            _config = config.Value;
+            _producer = producer;
         }
 
-        public async Task<bool> ProduceAsync(string topic, Message<TKey, TValue> message)
+        public async Task<bool> ProduceAsync(Message<TKey, TValue> message)
         {
             try
             {
-                var config = new ProducerConfig
-                {
-                    BootstrapServers = _kafkaSettings.BrokerLocation,
-                };
-
-                using (var producer = new ProducerBuilder<TKey, TValue>(config).Build())
-                {
-                    var deliveryReport = await producer.ProduceAsync(topic, message);
+                    var deliveryReport = await _producer.ProduceAsync(_config.Topic, message);
 
                     return deliveryReport.Status == PersistenceStatus.Persisted;
-                }
             }
             catch (Exception ex)
             {
@@ -38,6 +35,8 @@ namespace Infrastructure.Kafka
 
     public interface IKafkaProducer<TKey, TValue>
     {
-        Task<bool> ProduceAsync(string topic, Message<TKey, TValue> message);
+        Task<bool> ProduceAsync(Message<TKey, TValue> message);
     }
 }
+
+

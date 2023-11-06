@@ -1,55 +1,60 @@
-﻿using Confluent.Kafka;
-using Domain;
+﻿using Ardalis.GuardClauses;
+using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 
 namespace Infrastructure.Kafka
 {
-    public class KafkaConsumer<T> : IKafkaConsumer<T>
+    public class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey,TValue>
     {
-        private readonly KafkaSettings _kafkaSettings;
-        private Thread thread;
+        private readonly KafkaConsumerConfig _config;
 
-        public KafkaConsumer(IOptions<KafkaSettings> kafkaSettings)
+        public KafkaConsumer(IOptions<KafkaConsumerConfig> config)
         {
-            _kafkaSettings = kafkaSettings.Value;
+            Guard.Against.Null(config);
+
+            _config = config.Value;
         }
 
-        public async Task<IEnumerable<T>> ConsumeAsync(
-            string topic,
+        public async Task<IEnumerable<TValue>> ConsumeAsync(
             CancellationToken cancellationToken = default
         )
         {
-            var config = new ConsumerConfig
+            try
             {
-                GroupId = _kafkaSettings.GroupId,
-                BootstrapServers = _kafkaSettings.BrokerLocation,
-                AutoOffsetReset = AutoOffsetReset.Earliest
-            };
+                using var consumerBuilder = new ConsumerBuilder<TKey, TValue>(_config).SetValueDeserializer(new KafkaDeserializer<TValue>()).Build();
 
-            using (var consumerBuilder = new ConsumerBuilder<Ignore, string>(config).Build())
-            {
-                consumerBuilder.Subscribe(topic);
+                consumerBuilder.Subscribe(_config.Topic);
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var consumer = consumerBuilder.Consume(cancellationToken);
+                    var result = consumerBuilder.Consume(TimeSpan.FromMilliseconds(1000));
 
-                    var result = JsonSerializer.Deserialize<T>(consumer.Message.Value);
+                    if (result == null)
+                    {
+                        return new TValue[] { };
+                    }
 
-                    return new T[] { result };
+
+                    consumerBuilder.Commit(result);
+                    consumerBuilder.StoreOffset(result);
+                    var value = result.Message.Value ?? default(TValue);
+                    return new TValue[] { value };
                 }
-                consumerBuilder.Close();
+
+                return new TValue[] { };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Kafka error: {ex.Message}");
+                throw;
             }
 
-            return null;
         }
     }
 
-    public interface IKafkaConsumer<T>
+    public interface IKafkaConsumer<T, Tvalue>
     {
-        Task<IEnumerable<T>> ConsumeAsync(
-            string topic,
+        Task<IEnumerable<Tvalue>> ConsumeAsync(
             CancellationToken cancellationToken = default
         );
     }
