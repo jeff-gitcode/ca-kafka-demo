@@ -1,6 +1,8 @@
 using Application.Abstration;
+using Ardalis.GuardClauses;
 using Confluent.Kafka;
 using Domain;
+using MediatR;
 using Newtonsoft.Json;
 
 namespace Infrastructure.Kafka;
@@ -8,10 +10,13 @@ namespace Infrastructure.Kafka;
 public class KafkaUserRepository : IUserRepository
 {
     private readonly IKafkaProducer<Null, string> _kafkaProducer;
-    private readonly IKafkaConsumer<User> _kafkaConsumer;
+    private readonly IKafkaConsumer<Ignore, User> _kafkaConsumer;
 
-    public KafkaUserRepository(IKafkaProducer<Null, string> kafkaProducer, IKafkaConsumer<User> kafkaConsumer)
+    public KafkaUserRepository(IKafkaProducer<Null, string> kafkaProducer, IKafkaConsumer<Ignore, User> kafkaConsumer)
     {
+        Guard.Against.Null(kafkaProducer);
+        Guard.Against.Null(kafkaConsumer);
+
         _kafkaProducer = kafkaProducer;
         _kafkaConsumer = kafkaConsumer;
     }
@@ -25,8 +30,7 @@ public class KafkaUserRepository : IUserRepository
             Value = message
         };
 
-        string kafkaTopic = "user-test";
-        bool result = await _kafkaProducer.ProduceAsync(kafkaTopic, kafkaMessage);
+        bool result = await _kafkaProducer.ProduceAsync(kafkaMessage);
 
         if (result)
         {
@@ -49,7 +53,7 @@ public class KafkaUserRepository : IUserRepository
     public async Task<IEnumerable<User>> GetAll()
     {
         var cts = new CancellationTokenSource();
-        return await _kafkaConsumer.ConsumeAsync("user-test", cts.Token);
+        return await _kafkaConsumer.ConsumeAsync(cts.Token);
     }
 
     public Task<User> Update(User entity)

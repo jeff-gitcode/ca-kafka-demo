@@ -1,5 +1,6 @@
 using Application.Users.Commands;
 using Application.Users.Queries;
+using Ardalis.GuardClauses;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,9 @@ public class UserController : ControllerBase
 
     public UserController(ILogger<UserController> logger, IMediator mediator)
     {
+        Guard.Against.Null(logger);
+        Guard.Against.Null(mediator);
+
         _logger = logger;
         _mediator = mediator;
     }

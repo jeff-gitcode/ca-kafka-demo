@@ -1,6 +1,5 @@
 using Application;
 using Infrastructure;
-using Infrastructure.Kafka;
 using Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
