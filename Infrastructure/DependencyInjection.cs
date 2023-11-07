@@ -1,8 +1,6 @@
 ﻿using Application.Abstration;
-using Confluent.Kafka;
 using Infrastructure.Kafka;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 
 namespace Infrastructure;
 
