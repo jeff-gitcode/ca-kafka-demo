@@ -1,9 +1,9 @@
-﻿using Confluent.Kafka;
+﻿using AutoFixture.Xunit2;
+using Confluent.Kafka;
 using Domain;
 using Infrastructure.Kafka;
 using Microsoft.Extensions.Options;
 using Moq;
-using System.Threading;
 
 namespace Infrastructure.Tests
 {
@@ -21,25 +21,31 @@ namespace Infrastructure.Tests
             _kafkaSettings = new Mock<IOptions<KafkaSettings>>();
             _consumerBuilder = new Mock<IConsumer<Ignore, string>>();
 
+            _kafkaSettings.Setup(r => r.Value).Returns(new KafkaSettings()
+            {
+                GroupId = "groupid",
+                BrokerLocation = "http:localhost"
+            });
+
             _sut = new KafkaConsumer<User>(_kafkaSettings.Object);
         }
 
-        [Fact]
-        public async Task KafkaConsumerTests_WhenConsumeAsync_ShouldReturns()
+        [Theory, AutoData]
+        public async Task KafkaConsumerTests_WhenConsumeAsync_ShouldReturns(KafkaSettings kafkaSettings, User user)
         {
-            using var waitHandle = new AutoResetEvent(false);
+            var cts = new CancellationTokenSource();
+            var topic = "user-test";
+            var consumeResult = new ConsumeResult<Ignore, string>() { 
+            };
+            _consumerBuilder.Setup(r => r.Subscribe(topic));
 
-            _consumerBuilder.Setup(r => r.Subscribe(It.IsAny<string>()));
+            _consumerBuilder.Setup(r => r.Consume(It.IsAny<CancellationToken>()))
+                .Callback(() => Thread.Sleep(TimeSpan.FromMilliseconds(50)))
+                .Returns(consumeResult);
 
-            _consumerBuilder.Setup(r=> r.Consume(It.IsAny<CancellationToken>())).Callback<CancellationToken>(_ =>
-            {
-                //wait until signaled to finish
-                waitHandle.WaitOne();
-            });
+            var result = await _sut.ConsumeAsync(topic, cts.Token);
 
-            _consumerBuilder.Setup(r => r.Close());
-
-
+            _consumerBuilder.VerifyAll();
         }
     }
 }

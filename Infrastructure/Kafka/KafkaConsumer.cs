@@ -38,13 +38,20 @@ namespace Infrastructure.Kafka
 
                 if (consumer.Message.Value is null) continue;
 
-                var result = JsonSerializer.Deserialize<T>(consumer.Message.Value);
-
-                return new T[] { result };
+                return await HandleMessage(consumer);
             }
             consumerBuilder.Close();
 
             return null;
+        }
+
+        private async Task<IEnumerable<T>> HandleMessage(ConsumeResult<Ignore, string> consumer)
+        {
+            var result = JsonSerializer.Deserialize<T>(consumer.Message.Value);
+
+            await Task.CompletedTask;
+
+            return new T[] { result };
         }
     }
 
