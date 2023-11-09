@@ -2,6 +2,8 @@
 
 ![alt text](./doc/kafka-demo.jpg)
 
+![alt text](./doc/ca-kafka-demo-test.gif)
+
 ## Tech Stack
 
 - [x] ca
@@ -9,7 +11,13 @@
 - [x] kafka
 - [x] Kafdrop
 - [x] Zookeeper
-
+- [x] FluentAssertionso
+- [x] Testcontainers
+- [x] Autofixture
+- [x] Nito.AsyncEx
+- [x] .Net core test explorer
+![alt text](./doc/test-explorer.png)
+-
 ```javascript
 $ dotnet new sln -o ca-kafka-demo
 $ cd ca-kafka-demo
